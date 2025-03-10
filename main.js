@@ -1,52 +1,68 @@
 'use strict';
 
-function knightMoves(source, destiny) {
-    let movesInfo = [];
-    let doneArr = [];
-    let queue = [source];
-    while (queue.length != 0) {
-        let curr = queue.shift();
-        console.log(curr);
+function knightMoves(start, end) {
+    const BOARD_SIZE = 8;
 
-        if (curr === destiny) {
-            movesInfo.push(curr);
-            queue = [];
-            return;
+    if (start[0] >= BOARD_SIZE || start[0] < 0
+        || start[1] >= BOARD_SIZE || start[1] < 0
+        || end[0] >= BOARD_SIZE || end[0] < 0
+        || end[1] >= BOARD_SIZE || end[1] < 0
+    ) throw new Error('Invalid start or end!!');
+
+    const possibleMoves = [
+        [2, 1],
+        [1, 2],
+        [-1, 2],
+        [-2, 1],
+        [-2, -1],
+        [-1, -2],
+        [1, -2],
+        [2, -1],
+    ]
+
+    const set = new Set();
+    const queue = [{ vertex: start, path: [] }];
+
+    while (queue.length > 0) {
+        const { vertex, path } = queue.shift();
+
+        if (vertex[0] === end[0] && vertex[1] === end[1]) {
+            path.push(vertex);
+            console.log(`=> You made it in ${path.length - 1} moves! Here's your path from [${start}] to [${end}]: \n`);
+            console.log(path);
+            return path;
         }
-        if (!doneArr.some(() => curr)) {
-            if ((curr[0] + 2 < 8 && curr[0] + 2 >= 0) && (curr[1] + 1 < 8 && curr[1] + 1 >= 0)) queue.push([curr[0] + 2, curr[1] + 1]);
-            if ((curr[0] + 1 < 8 && curr[0] + 1 >= 0) && (curr[1] + 2 < 8 && curr[1] + 2 >= 0)) queue.push([curr[0] + 1, curr[1] + 2]);
-            if ((curr[0] - 1 < 8 && curr[0] - 1 >= 0) && (curr[1] + 2 < 8 && curr[1] + 2 >= 0)) queue.push([curr[0] - 1, curr[1] + 2]);
-            if ((curr[0] - 2 < 8 && curr[0] - 2 >= 0) && (curr[1] + 1 < 8 && curr[1] + 1 >= 0)) queue.push([curr[0] - 2, curr[1] + 1]);
-            if ((curr[0] - 2 < 8 && curr[0] - 2 >= 0) && (curr[1] - 1 < 8 && curr[1] - 1 >= 0)) queue.push([curr[0] - 2, curr[1] - 1]);
-            if ((curr[0] - 1 < 8 && curr[0] - 1 >= 0) && (curr[1] - 2 < 8 && curr[1] - 2 >= 0)) queue.push([curr[0] - 1, curr[1] - 2]);
-            if ((curr[0] + 1 < 8 && curr[0] + 1 >= 0) && (curr[1] - 2 < 8 && curr[1] - 2 >= 0)) queue.push([curr[0] + 1, curr[1] - 2]);
-            if ((curr[0] + 2 < 8 && curr[0] + 2 >= 0) && (curr[1] - 1 < 8 && curr[1] - 1 >= 0)) queue.push([curr[0] + 2, curr[1] - 1]);
+
+        for (let move of possibleMoves) {
+            const nextMove = [vertex[0] + move[0], vertex[1] + move[1]];
+
+            if (
+                nextMove[0] >= BOARD_SIZE
+                || nextMove[0] < 0
+                || nextMove[1] >= BOARD_SIZE
+                || nextMove[1] < 0
+            ) continue;
+
+            if (set.has(JSON.stringify(nextMove))) continue;
+
+            set.add(JSON.stringify(nextMove));
+            queue.push({ vertex: nextMove, path: [...path, vertex] });
         }
-        doneArr.push(curr.slice());
-        movesInfo.push(curr);
-        console.log('Q - ', queue.slice());
-        console.log('Done Array - ', doneArr);
-        // levelOrderRec(queue[0]);
     }
-    return movesInfo;
+    return null;
 }
 
-const board = [...Array(8)];
-// .map(e => Array(8));
+knightMoves([3, 3], [6, 6]);
+console.log('');
+knightMoves([3, 3], [4, 3]);
+console.log('');
+knightMoves([0, 0], [3, 3]);
+console.log('');
+knightMoves([3, 3], [0, 0]);
+console.log('');
+knightMoves([0, 0], [7, 7]);
 
-for (let i = 0; i < 8 * 8; i++) {
-    for (let j = 0; j < 8; j++)
-        // board[i] = [j];
-        board[j] = [i, j];
-}
+// knightMoves([0, 9], [0, 0]);
 
-// board[0][0] = 'Hi Mr.A';
-// board[0][1] = 'Hi Mr.A';
-// board[1][3] = 'Hi Mr.B';
-
-console.log(board);
-// console.log(board[2][4]);
-// console.log(board.some(() => [63, 3]));
-
-console.log(knightMoves([3, 3], [7, 7]));
+// console.log(knightMoves([3, 3], [6, 6]));
+// console.log(knightMoves([0, 0], [7, 7]));
